@@ -11,6 +11,8 @@ using SmartHunter.Game.Helpers;
 using SmartHunter.Ui.Windows;
 using XamlReader = System.Windows.Markup.XamlReader;
 
+using SmartHunter.StartServer;
+
 namespace SmartHunter
 {
     public partial class App : Application
@@ -60,6 +62,11 @@ namespace SmartHunter
             m_Overlay = new MhwOverlay(new ConsoleWindow(), new TeamWidgetWindow(), new MonsterWidgetWindow(), new PlayerWidgetWindow(), new DebugWidgetWindow());
 
             base.OnStartup(e);
+
+            //Start Up Server//
+            WebServer.StartServerOnThread();
+            //WebServer.StartServer();
+            //Start Up Server//
         }
 
         protected override void OnExit(ExitEventArgs e)

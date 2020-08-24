@@ -11,6 +11,8 @@ using SmartHunter.Core.Helpers;
 using SmartHunter.Game.Config;
 using SmartHunter.Game.Data;
 using SmartHunter.Game.Data.ViewModels;
+using SmartHunter.Game.Data.WidgetContexts;
+using SmartHunter.StartServer;
 
 namespace SmartHunter.Game.Helpers
 {
@@ -184,6 +186,8 @@ namespace SmartHunter.Game.Helpers
 
         public static void UpdatePlayerWidget(Process process, ulong baseAddress, ulong equipmentAddress, ulong weaponAddress)
         {
+            List<PlayerStatusEffect> playerStatusEffects = new List<PlayerStatusEffect>();
+            
             for (int index = 0; index < ConfigHelper.PlayerData.Values.StatusEffects.Length; ++index)
             {
                 var statusEffectConfig = ConfigHelper.PlayerData.Values.StatusEffects[index];
@@ -275,14 +279,19 @@ namespace SmartHunter.Game.Helpers
                         allConditionsPassed = false;
                     }
                 }
-
-                OverlayViewModel.Instance.PlayerWidget.Context.UpdateAndGetPlayerStatusEffect(index, timer, allConditionsPassed);
+                //Here
+                PlayerStatusEffect playerStatusEffect = OverlayViewModel.Instance.PlayerWidget.Context.UpdateAndGetPlayerStatusEffect(index, timer, allConditionsPassed);
+                if(playerStatusEffect != null)
+                {
+                    playerStatusEffects.Add(playerStatusEffect);
+                }
             }
+            WebServer.WebUpdatePlayerData(playerStatusEffects);
         }
 
         public static void UpdateTeamWidget(Process process, ulong playerDamageCollectionAddress, ulong playerNameCollectionAddress)
         {
-            List<Player> updatedPlayers = new List<Player>();
+            List<Player> updatedPlayers = new List<Player>();//Here
 
             for (int playerIndex = 0; playerIndex < DataOffsets.PlayerDamageCollection.MaxPlayerCount; ++playerIndex)
             {
@@ -301,6 +310,10 @@ namespace SmartHunter.Game.Helpers
             {
                 OverlayViewModel.Instance.TeamWidget.Context.ClearPlayers();
             }
+
+            //Update Player Data Begin//
+            WebServer.WebUpdateTeamData(updatedPlayers);
+            // Update Player Data End //
         }
 
         private static Player UpdateAndGetTeamPlayer(Process process, int playerIndex, ulong playerDamageCollectionAddress, ulong playerNameCollectionAddress)
@@ -317,6 +330,10 @@ namespace SmartHunter.Game.Helpers
             if (!String.IsNullOrEmpty(name) || damage > 0)
             {
                 player = OverlayViewModel.Instance.TeamWidget.Context.UpdateAndGetPlayer(playerIndex, name, damage);
+            }
+            if(player != null)
+            {
+                return player;
             }
 
             return player;
@@ -408,6 +425,7 @@ namespace SmartHunter.Game.Helpers
             bool flg = false;
             if (mapBaseAddress != 0x0)
             {
+
                 bool isMonsterSelected = MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x128) != 0x0 && MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x130) != 0x0 && MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x160) != 0x0;
                 if (isMonsterSelected)
                 {
@@ -422,6 +440,11 @@ namespace SmartHunter.Game.Helpers
                             OverlayViewModel.Instance.MonsterWidget.Context.Monsters.Remove(obsoleteMonster);
                         }
                     }
+                    //Update Monster Data Begin//
+                    List<Monster> updatedSelectedMonsters = new List<Monster>();
+                    updatedSelectedMonsters.Add(selectedMonster);
+                    WebServer.WebUpdateMonsterData(updatedSelectedMonsters);
+                    // Update Monster Data End //
                 }
             }
 
@@ -451,7 +474,7 @@ namespace SmartHunter.Game.Helpers
                     currentMonsterAddress = MemoryHelper.Read<ulong>(process, currentMonsterAddress + DataOffsets.Monster.NextMonsterOffset);
                 }
 
-                List<Monster> updatedMonsters = new List<Monster>();
+                List<Monster> updatedMonsters = new List<Monster>();//Here
                 foreach (var monsterAddress in monsterAddresses)
                 {
                     var monster = UpdateAndGetMonster(process, monsterAddress);
@@ -466,6 +489,12 @@ namespace SmartHunter.Game.Helpers
                 {
                     OverlayViewModel.Instance.MonsterWidget.Context.Monsters.Remove(obsoleteMonster);
                 }
+
+
+                //Update Monster Data Begin//
+                WebServer.WebUpdateMonsterData(updatedMonsters);
+                // Update Monster Data End //
+
             }
 
             if (ConfigHelper.Main.Values.Overlay.MonsterWidget.UseNetworkServer && ServerManager.Instance.IsServerOline == 1 && OverlayViewModel.Instance.DebugWidget.Context.CurrentGame.IsValid && OverlayViewModel.Instance.DebugWidget.Context.CurrentGame.IsPlayerOnline())
@@ -930,5 +959,236 @@ namespace SmartHunter.Game.Helpers
                 monster.UpdateAndGetStatusEffect(rageAddress, Array.IndexOf(ConfigHelper.MonsterData.Values.StatusEffects, rageStatusEffect), maxRageBuildUp > 0 ? maxRageBuildUp : 1, !rageStatusEffect.InvertBuildup ? currentRageBuildUp : maxRageBuildUp - currentRageBuildUp, maxRageDuration, !rageStatusEffect.InvertDuration ? currentRageDuration : maxRageDuration - currentRageDuration, rageActivatedCount);
             }
         }
+
+        public static void GetMonsterData(Process process, ulong monsterBaseList, ulong mapBaseAddress)
+        {
+            List<ulong> selectedMonsterAddresses = WebServer.selectedMonsterAddresses;
+            List<Monster> updatedMonsters = new List<Monster>();
+
+            bool isMonsterSelected = false;
+            if (mapBaseAddress != 0x0)
+            {
+                isMonsterSelected = MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x128) != 0x0 && MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x130) != 0x0 && MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x160) != 0x0;
+                if (isMonsterSelected)
+                {
+                    ulong selectedMonsterAddress = MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x148) - 0X40;
+                    var selectedMonster = UpdateAndGetMonster(process, selectedMonsterAddress);
+                    if (selectedMonster != null)
+                    {
+                        //Update Monster Data Begin//
+                        if(selectedMonsterAddresses.Count() > 3)
+                        {
+                            selectedMonsterAddresses.RemoveAt(3);
+                        }
+                        selectedMonsterAddresses.Remove(selectedMonsterAddress);
+                        selectedMonsterAddresses.Insert(0, selectedMonsterAddress);
+                        // Update Monster Data End //
+                    }
+                }
+            }
+            for (int i = 0; i < selectedMonsterAddresses.Count(); i++)
+            {
+                var monster = UpdateAndGetMonster(process, selectedMonsterAddresses.ElementAt(i));
+                if (monster != null)
+                {
+                    updatedMonsters.Add(monster);
+                }
+                else
+                {
+                    selectedMonsterAddresses.RemoveAt(i--);
+                }
+            }
+            WebServer.WebUpdateMonsterData(updatedMonsters);
+        }
+        
+        public static void GetPlayerData(Process process, ulong baseAddress, ulong equipmentAddress, ulong weaponAddress)
+        {
+            List<PlayerStatusEffect> playerStatusEffects = new List<PlayerStatusEffect>();
+
+            for (int index = 0; index < ConfigHelper.PlayerData.Values.StatusEffects.Length; ++index)
+            {
+                var statusEffectConfig = ConfigHelper.PlayerData.Values.StatusEffects[index];
+
+                ulong sourceAddress = baseAddress;
+                if (statusEffectConfig.Source == (uint)StatusEffectConfig.MemorySource.Equipment)
+                {
+                    sourceAddress = equipmentAddress;
+                }
+                else if (statusEffectConfig.Source != (uint)StatusEffectConfig.MemorySource.Base)
+                {
+                    sourceAddress = weaponAddress;
+                }
+
+                bool allConditionsPassed = true;
+                if (statusEffectConfig.Conditions != null)
+                {
+                    foreach (var condition in statusEffectConfig.Conditions)
+                    {
+                        bool isOffsetChainValid = true;
+                        List<long> offsets = new List<long>();
+                        foreach (var offsetString in condition.Offsets)
+                        {
+                            if (TryParseHex(offsetString, out var offset))
+                            {
+                                offsets.Add(offset);
+                            }
+                            else
+                            {
+                                isOffsetChainValid = false;
+                                break;
+                            }
+                        }
+
+                        if (!isOffsetChainValid)
+                        {
+                            allConditionsPassed = false;
+                            break;
+                        }
+
+                        var conditionAddress = MemoryHelper.ReadMultiLevelPointer(false, process, sourceAddress + (ulong)offsets.First(), offsets.Skip(1).ToArray());
+
+                        bool isPassed = false;
+                        if (condition.ByteValue.HasValue)
+                        {
+                            var conditionValue = MemoryHelper.Read<byte>(process, conditionAddress);
+                            isPassed = conditionValue == condition.ByteValue;
+                        }
+                        else if (condition.IntValue.HasValue)
+                        {
+                            var conditionValue = MemoryHelper.Read<int>(process, conditionAddress);
+                            isPassed = conditionValue == condition.IntValue;
+                        }
+                        else if (condition.StringRegexValue != null)
+                        {
+                            var conditionValue = MemoryHelper.ReadString(process, conditionAddress, 64);
+                            isPassed = new Regex(condition.StringRegexValue).IsMatch(conditionValue);
+                        }
+
+                        if (!isPassed)
+                        {
+                            allConditionsPassed = false;
+                            break;
+                        }
+                    }
+                }
+                if (statusEffectConfig.Source != (uint)StatusEffectConfig.MemorySource.Base && statusEffectConfig.Source != (uint)StatusEffectConfig.MemorySource.Equipment)
+                {
+                    if (!OverlayViewModel.Instance.DebugWidget.Context.CurrentGame.IsValid)
+                    {
+                        continue;
+                    }
+                    if (OverlayViewModel.Instance.DebugWidget.Context.CurrentGame.CurrentEquippedWeaponType() != (WeaponType)statusEffectConfig.Source)
+                    {
+                        allConditionsPassed = false;
+                    }
+                }
+                float? timer = null;
+                if (allConditionsPassed && statusEffectConfig.TimerOffset != null)
+                {
+                    if (TryParseHex(statusEffectConfig.TimerOffset, out var timerOffset))
+                    {
+                        timer = MemoryHelper.Read<float>(process, (ulong)((long)sourceAddress + timerOffset));
+                    }
+
+                    if (timer <= 0)
+                    {
+                        timer = 0;
+                        allConditionsPassed = false;
+                    }
+                }
+
+                PlayerStatusEffect playerStatusEffect = OverlayViewModel.Instance.PlayerWidget.Context.UpdateAndGetPlayerStatusEffect(index, timer, allConditionsPassed);
+                if (playerStatusEffect != null)
+                {
+                    playerStatusEffects.Add(playerStatusEffect);
+                }
+            }
+            WebServer.WebUpdatePlayerData(playerStatusEffects);
+        }
+        
+        public static void GetTeamData(Process process, ulong playerDamageCollectionAddress, ulong playerNameCollectionAddress)
+        {
+            List<Player> updatedPlayers = new List<Player>();//Here
+
+            for (int playerIndex = 0; playerIndex < DataOffsets.PlayerDamageCollection.MaxPlayerCount; ++playerIndex)
+            {
+                var player = GetTeamPlayer(process, playerIndex, playerDamageCollectionAddress, playerNameCollectionAddress);
+                if (player != null)
+                {
+                    updatedPlayers.Add(player);
+                }
+            }
+
+            if (updatedPlayers.Any())
+            {
+                OverlayViewModel.Instance.TeamWidget.Context.UpdateFractions();
+            }
+            else if (OverlayViewModel.Instance.TeamWidget.Context.Players.Any())
+            {
+                OverlayViewModel.Instance.TeamWidget.Context.ClearPlayers();
+            }
+
+            if (!WebServer.allPlayers.Any())
+            {
+                WebServer.allPlayers = updatedPlayers;
+            }
+            if (!OverlayViewModel.Instance.DebugWidget.Context.CurrentGame.IsPlayerInExpedition && updatedPlayers.Any())
+            {
+                WebServer.WebUpdateTeamData(updatedPlayers);
+            }
+            //Update Player Data Begin//
+            //WebServer.WebUpdateTeamData(updatedPlayers);
+            // Update Player Data End //
+        }
+        public static void GetPlayerDamage(Process process, ulong damageOnScreenPtr)
+        {
+            List<Player> p = WebServer.allPlayers;
+            if (p.Any())
+            {
+                ulong startOfList = damageOnScreenPtr + 0x2900;
+                ulong currentItem = startOfList;
+                for (int i = 0; i < DataOffsets.PlayerDamage.MaxOnScreenDamages; i++)
+                {
+                    int id1 = MemoryHelper.Read<int>(process, currentItem + 0x20);
+                    int id2 = MemoryHelper.Read<int>(process, currentItem + 0x24);
+
+                    if (expeditionDamageChecker[i, 0] != id1 && expeditionDamageChecker[i, 1] != id2)
+                    {
+                        expeditionDamageChecker[i, 0] = id1;
+                        expeditionDamageChecker[i, 1] = id2;
+
+                        int value = MemoryHelper.Read<int>(process, currentItem + 0x34);
+
+                        p.ElementAt(0).Damage += value;
+                    }
+                    currentItem += 0x90;
+                }
+            }
+            WebServer.allPlayers = p;
+            WebServer.WebUpdateTeamData(p);
+        }
+        private static Player GetTeamPlayer(Process process, int playerIndex, ulong playerDamageCollectionAddress, ulong playerNameCollectionAddress)
+        {
+            Player player = null;
+
+            var playerNameOffset = (ulong)DataOffsets.PlayerNameCollection.PlayerNameLength * (ulong)playerIndex;
+            string name = MemoryHelper.ReadString(process, playerNameCollectionAddress + DataOffsets.PlayerNameCollection.FirstPlayerName + playerNameOffset, (uint)DataOffsets.PlayerNameCollection.PlayerNameLength);
+            ulong firstPlayerPtr = playerDamageCollectionAddress + DataOffsets.PlayerDamageCollection.FirstPlayerPtr;
+            ulong currentPlayerPtr = firstPlayerPtr + ((ulong)playerIndex * DataOffsets.PlayerDamageCollection.NextPlayerPtr);
+            ulong currentPlayerAddress = MemoryHelper.Read<ulong>(process, currentPlayerPtr);
+            int damage = MemoryHelper.Read<int>(process, currentPlayerAddress + DataOffsets.PlayerDamage.Damage);
+
+            if (!String.IsNullOrEmpty(name) || damage > 0)
+            {
+                player = OverlayViewModel.Instance.TeamWidget.Context.UpdateAndGetPlayer(playerIndex, name, damage);
+            }
+            if (player != null)
+            {
+                return player;
+            }
+
+            return player;
+        }
+        
     }
 }

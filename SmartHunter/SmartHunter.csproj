@@ -25,6 +25,12 @@
     <Exec Command="xcopy /E /Y &quot;$(ProjectDir)Ui\Resources&quot; &quot;$(TargetDir)&quot;" />
   </Target>
   <ItemGroup>
+    <None Remove="Resources\PAGE.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PAGE.html" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial;
+            padding: 10px;
+            background: #f1f1f1;
+        }
+
+        /* Header/Blog Title */
+        .header {
+            padding: 30px;
+            text-align: center;
+            background: white;
+        }
+
+            .header h1 {
+                font-size: 50px;
+            }
+
+        /* Style the top navigation bar */
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+            /* Style the topnav links */
+            .topnav a {
+                float: left;
+                display: block;
+                color: #f2f2f2;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            }
+
+                /* Change color on hover */
+                .topnav a:hover {
+                    background-color: #ddd;
+                    color: black;
+                }
+
+        /* Create two unequal columns that floats next to each other */
+        /* Left column */
+        .leftcolumn {
+            float: left;
+            width: 75%;
+        }
+
+        /* Right column */
+        .rightcolumn {
+            float: left;
+            width: 25%;
+            background-color: #f1f1f1;
+            padding-left: 20px;
+        }
+
+        /* Fake image */
+        .fakeimg {
+            border-radius: 6px;
+            background-color: #eee;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Add a card effect for articles */
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background: #ddd;
+            margin-top: 20px;
+        }
+
+        .collapsible {
+            margin-top: 10px;
+            background-color: #eee;
+            color: black;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+        }
+
+            .active, .collapsible:hover {
+                background-color: #e1e1e1;
+            }
+
+        .content {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
+            background-color: #f1f1f1;
+        }
+
+        .MonsterHealthBar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 6px;
+        }
+
+        .MonsterHealthBarField {
+            width: 1%;
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 6px;
+        }
+
+        /* Responsive layout - when the screen is less than 1060px wide, make the two columns stack on top of each other instead of next to each other */
+        @media screen and (max-width: 1060px) {
+            .leftcolumn, .rightcolumn {
+                width: 100%;
+                padding: 0;
+            }
+        }
+
+        /* Responsive layout - when the screen is less than 768px wide, make the navigation links stack on top of each other instead of next to each other */
+        @media screen and (max-width: 768px) {
+            .topnav a {
+                float: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header" id="header">
+        <h1>Http Smart Hunter</h1>
+        <p>Dynamic web end for monster data display based on <a href="https://github.com/gabrielefilipp/SmartHunter" style="color:black;">SmartHunter</a></p>
+    </div>
+
+    <div class="topnav">
+        <a href="#Monster1">Monster 1</a>
+        <a href="#Monster2">Monster 2</a>
+        <a href="#Monster3">Monster 3</a>
+        <a href="#Player" style="float:right">Player</a>
+    </div>
+
+    <div class="row">
+        <div class="leftcolumn">
+            <div class="card" id="Monster1">
+                <h2 class="MonsterNameData">Monster Name Here</h2>
+                <h5 class="MonsterSizeData">Monster Size Data</h5>
+                <div class="fakeimg" style="height:80px;">
+                    <div style="text-align: center;padding-bottom: 10px;" class = "MonsterHealthLevel">Health Percentage</div>
+                    <div class="MonsterHealthBar"><div class="MonsterHealthBarField" style="width:30%"></div></div>
+                </div>
+                <button type="button" class="collapsible">Part and Status Data</button>
+                <div class="content">
+                    <p class="MonsterStatusData">Monster Data Here</p>
+                </div>
+            </div>
+            <div class="card" id="Monster2">
+                <h2 class="MonsterNameData">Monster Name Here</h2>
+                <h5 class="MonsterSizeData">Monster Size Data</h5>
+                <div class="fakeimg" style="height:80px;">
+                    <div style="text-align: center;padding-bottom: 10px;" class = "MonsterHealthLevel">Health Percentage</div>
+                    <div class="MonsterHealthBar"><div class="MonsterHealthBarField" style="width:30%"></div></div>
+                </div>
+                <button type="button" class="collapsible">Part and Status Data</button>
+                <div class="content">
+                    <p class="MonsterStatusData">Monster Data Here</p>
+                </div>
+            </div>
+            <div class="card" id="Monster3">
+                <h2 class="MonsterNameData">Monster Name Here</h2>
+                <h5 class="MonsterSizeData">Monster Size Data</h5>
+                <div class="fakeimg" style="height:80px;">
+                    <div style="text-align: center;padding-bottom: 10px;" class = "MonsterHealthLevel">Health Percentage</div>
+                    <div class="MonsterHealthBar"><div class="MonsterHealthBarField" style="width:30%"></div></div>
+                </div>
+                <button type="button" class="collapsible">Part and Status Data</button>
+                <div class="content">
+                    <p class="MonsterStatusData">Monster Data Here</p>
+                </div>
+            </div>
+        </div>
+        <div class="rightcolumn">
+            <div class="card" id="Player">
+                <h2>Player Data</h2>
+                <div class="fakeimg" style="margin-bottom:10px;">Player Status Data<p id="PlayerData1">Data Goes Here</p></div>
+                <button type="button" class="collapsible">Part and Status Data</button>
+                <div class="fakeimg">
+                    <button type="button" class="collapsible">Player Damage Data</button>
+                    <div class="content">
+                        <p id="PlayerData2">Player Damage Data here</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Info</h3>
+                <div class="fakeimg" style="margin-bottom:10px; padding-top:1px">
+                    <p>Only able to show the monster being tracked</p>
+                </div>
+                <div class="fakeimg" style="margin-bottom:10px; padding-top:1px">
+                    <p>Damages are not available unless *IsVisible* for TeamDamage is true</p>
+                </div>
+                <div class="fakeimg" style="margin-bottom:0px; padding-top:1px">
+                    <p>Player buff data are not yet completed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <h2><a href="#header" style="color:black;text-decoration: none;">Back to Top</a></h2>
+    </div>
+
+</body>
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+            content.style.display = "none";
+            } else {
+            content.style.display = "block";
+            }
+        });
+    }
+    var update = setInterval(updateData, 1000);
+    var xhttp = new XMLHttpRequest();
+    function updateData() {
+
+    fetch("/MonsterDataPack",{method:'POST'})
+    .then(res => res.text())
+    .then(monsterJson => {
+    var monsterData = JSON.parse(monsterJson);
+
+    document.getElementById("PlayerData1").innerHTML = monsterData.playerBuffs;
+    document.getElementById("PlayerData2").innerHTML = monsterData.playerDamage;
+
+    var monsterNameField = document.getElementsByClassName("MonsterNameData");
+    var monsterSizeField = document.getElementsByClassName("MonsterSizeData");
+    var monsterHealthField = document.getElementsByClassName("MonsterHealthLevel");
+    var monsterHealthBar = document.getElementsByClassName("MonsterHealthBarField");
+    var monsterStatusField = document.getElementsByClassName("MonsterStatusData");
+
+    for (i = 0; i < monsterNameField.length; i++) {
+        monsterNameField[i].innerHTML = monsterData.monsters[i].monsterName;
+    }
+    for (i = 0; i < monsterSizeField.length; i++) {
+        monsterSizeField[i].innerHTML = monsterData.monsters[i].monsterSize;
+    }
+    for (i = 0; i < monsterHealthField.length; i++) {
+        monsterHealthField[i].innerHTML = monsterData.monsters[i].monsterCurrentHealth + "/" + monsterData.monsters[i].monsterMaxHealth;
+    }
+    for (i = 0; i < monsterHealthBar.length; i++) {
+        monsterHealthBar[i].style.width = (monsterData.monsters[i].monsterCurrentHealth * 100 / monsterData.monsters[i].monsterMaxHealth) + "%";
+    }
+    for (i = 0; i < monsterStatusField.length; i++) {
+        monsterStatusField[i].innerHTML = monsterData.monsters[i].monsterStatus;
+    }
+    })
+    .catch(error => {});;
+    
+    }
+</script>
+</html>
