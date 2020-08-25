@@ -15,7 +15,9 @@ namespace SmartHunter.StartServer
     class WebServer
     {
         public static HttpListener listener;
-        public static string url = "http://localhost:25565/";
+        //If you want to see the data on smartphone it is recommended to change this to "http://*:8080/", which would need to be run as admin
+        //I might add manifest to force admin in the future
+        public static string url = "http://localhost:8080/";
         public static int requestCount = 0;
         public static string pageData;
 

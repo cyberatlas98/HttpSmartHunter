@@ -959,7 +959,7 @@ namespace SmartHunter.Game.Helpers
                 monster.UpdateAndGetStatusEffect(rageAddress, Array.IndexOf(ConfigHelper.MonsterData.Values.StatusEffects, rageStatusEffect), maxRageBuildUp > 0 ? maxRageBuildUp : 1, !rageStatusEffect.InvertBuildup ? currentRageBuildUp : maxRageBuildUp - currentRageBuildUp, maxRageDuration, !rageStatusEffect.InvertDuration ? currentRageDuration : maxRageDuration - currentRageDuration, rageActivatedCount);
             }
         }
-
+        //code below was added//
         public static void GetMonsterData(Process process, ulong monsterBaseList, ulong mapBaseAddress)
         {
             List<ulong> selectedMonsterAddresses = WebServer.selectedMonsterAddresses;
@@ -1000,7 +1000,6 @@ namespace SmartHunter.Game.Helpers
             }
             WebServer.WebUpdateMonsterData(updatedMonsters);
         }
-        
         public static void GetPlayerData(Process process, ulong baseAddress, ulong equipmentAddress, ulong weaponAddress)
         {
             List<PlayerStatusEffect> playerStatusEffects = new List<PlayerStatusEffect>();
@@ -1105,7 +1104,6 @@ namespace SmartHunter.Game.Helpers
             }
             WebServer.WebUpdatePlayerData(playerStatusEffects);
         }
-        
         public static void GetTeamData(Process process, ulong playerDamageCollectionAddress, ulong playerNameCollectionAddress)
         {
             List<Player> updatedPlayers = new List<Player>();//Here
