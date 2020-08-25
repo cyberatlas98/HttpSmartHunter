@@ -23,7 +23,8 @@ namespace SmartHunter.StartServer
 
         public static string AllBuffs = "";
 
-        public static string AllPlayerDamage = "";
+        public static string AllPlayerDamage = "Dame dane";
+        static bool showPlayerDamage = false;
 
         public static string[] monsterNames = { "No Monster Data", "No Monster Data", "No Monster Data" };
         public static string[] monsterSizes = { "null", "null", "null" };
@@ -126,6 +127,8 @@ namespace SmartHunter.StartServer
         }
         public static void WebUpdateTeamData(List<Player> playerData)
         {
+            if (!showPlayerDamage){ return; }
+
             int TotalDamage = 0;
             int playerCount = playerData.Count();
             string DamageData = "";
