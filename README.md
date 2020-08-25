@@ -34,3 +34,8 @@ I simply added some functions to start a httpserver to respond to the page that 
 ## Releases
 They are essentially the same version, but I planned on releasing multiple copy compiled in different way just in case anyone wants a specific version but don't know how to compile it. I will add a settings file in the future.
 
+## Credits
+- Based on [SmartHunter](https://github.com/gabrielefilipp/SmartHunter)
+- Inspired by [ReactHunter](https://github.com/Lenshang/ReactHunter)
+- HTML template from [www.w3schools.com](https://www.w3schools.com/css/css_website_layout.asp)
+
