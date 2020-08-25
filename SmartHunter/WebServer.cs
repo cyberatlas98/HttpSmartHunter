@@ -9,6 +9,7 @@ using System.Linq;
 using System.Collections.Generic;
 using SmartHunter.Game.Data;
 using System.Runtime.Serialization.Json;
+using SmartHunter.Core;
 
 namespace SmartHunter.StartServer
 {
@@ -17,7 +18,7 @@ namespace SmartHunter.StartServer
         public static HttpListener listener;
         //If you want to see the data on smartphone it is recommended to change this to "http://*:8080/", which would need to be run as admin
         //I might add manifest to force admin in the future
-        public static string url = "http://localhost:8080/";
+        public static string url = "http://*:8080/";
         public static int requestCount = 0;
         public static string pageData;
 
@@ -86,9 +87,21 @@ namespace SmartHunter.StartServer
             }
 
             // Create a Http server and start listening for incoming connections
-            listener = new HttpListener();
-            listener.Prefixes.Add(url);
-            listener.Start();
+            try
+            {
+                listener = new HttpListener();
+                listener.Prefixes.Add(url);
+                listener.Start();
+            }
+            catch
+            {
+                Log.WriteLine("");
+                Log.WriteLine("ERROR STARTING THE HTTP_LISTENER, MAYBE CHECK ADMIN AND PORT?");
+                Log.WriteLine("Starting server in localhost:8080");
+                listener = new HttpListener();
+                listener.Prefixes.Add("http://localhost:8080/");
+                listener.Start();
+            }
             //Console.WriteLine("Listening for connections on {0}", url);
 
             // Handle requests
@@ -102,6 +115,14 @@ namespace SmartHunter.StartServer
             thread1.IsBackground = true;
             //thread1.Start();
             StartServer();
+            // Get the IP  
+            string IP = Dns.GetHostByName(Dns.GetHostName()).AddressList[0].ToString();
+            Log.WriteLine("");
+            Log.WriteLine("=========================");
+            Log.WriteLine("== Your IP address is: ==");
+            Log.WriteLine("==   " + IP + "   ==");
+            Log.WriteLine("=========================");
+            Log.WriteLine("");
         }
         public static void EndServer()
         {
@@ -116,7 +137,7 @@ namespace SmartHunter.StartServer
                 AllBuffs += pSE.Name + ": ";
                 if (pSE.Time != null)
                 {
-                    AllBuffs += pSE.Time.Current + "/" + pSE.Time.Max;
+                    AllBuffs += Math.Round(pSE.Time.Current) + "/" + Math.Round(pSE.Time.Max);
                 }
                 AllBuffs += "<br />";
             }
@@ -182,8 +203,8 @@ namespace SmartHunter.StartServer
                     {
                         monsterPartsAndStatuses[i]
                         += statusEffect.Name + " Build: "
-                        + statusEffect.Buildup.Fraction * 100 + "% / Dur "
-                        + statusEffect.Duration.Fraction * 100 + "% <br />";
+                        + Math.Round(statusEffect.Buildup.Fraction) * 100 + "% / Dur "
+                        + Math.Round(statusEffect.Duration.Fraction) * 100 + "% <br />";
                     }
                 }
             }

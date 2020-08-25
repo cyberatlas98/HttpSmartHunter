@@ -170,7 +170,7 @@
                     <div style="text-align: center;padding-bottom: 10px;" class = "MonsterHealthLevel">Health Percentage</div>
                     <div class="MonsterHealthBar"><div class="MonsterHealthBarField" style="width:30%"></div></div>
                 </div>
-                <button type="button" class="collapsible">Part and Status Data</button>
+                <button type="button" class="collapsible">Part and Status Data (Click)</button>
                 <div class="content">
                     <p class="MonsterStatusData">Monster Data Here</p>
                 </div>
@@ -182,7 +182,7 @@
                     <div style="text-align: center;padding-bottom: 10px;" class = "MonsterHealthLevel">Health Percentage</div>
                     <div class="MonsterHealthBar"><div class="MonsterHealthBarField" style="width:30%"></div></div>
                 </div>
-                <button type="button" class="collapsible">Part and Status Data</button>
+                <button type="button" class="collapsible">Part and Status Data (Click)</button>
                 <div class="content">
                     <p class="MonsterStatusData">Monster Data Here</p>
                 </div>
@@ -194,7 +194,7 @@
                     <div style="text-align: center;padding-bottom: 10px;" class = "MonsterHealthLevel">Health Percentage</div>
                     <div class="MonsterHealthBar"><div class="MonsterHealthBarField" style="width:30%"></div></div>
                 </div>
-                <button type="button" class="collapsible">Part and Status Data</button>
+                <button type="button" class="collapsible">Part and Status Data (Click)</button>
                 <div class="content">
                     <p class="MonsterStatusData">Monster Data Here</p>
                 </div>
@@ -203,8 +203,13 @@
         <div class="rightcolumn">
             <div class="card" id="Player">
                 <h2>Player Data</h2>
-                <div class="fakeimg" style="margin-bottom:10px;">Player Status Data<p id="PlayerData1">Data Goes Here</p></div>
-                <button type="button" class="collapsible">Part and Status Data</button>
+                <h5>Player Buff and Damage Data</h5>
+                <div class="fakeimg" style="margin-bottom:10px;">
+                    <button type="button" class="collapsible">Player Status Data</button>
+                    <div class="content">
+                        <p id="PlayerData1">Data Goes Here</p>
+                    </div>
+                </div>
                 <div class="fakeimg">
                     <button type="button" class="collapsible">Player Damage Data</button>
                     <div class="content">
@@ -215,13 +220,13 @@
             <div class="card">
                 <h3>Info</h3>
                 <div class="fakeimg" style="margin-bottom:10px; padding-top:1px">
-                    <p>Only able to show the monster being tracked</p>
+                    <p>Monster that was tracked was registered</p>
                 </div>
                 <div class="fakeimg" style="margin-bottom:10px; padding-top:1px">
-                    <p>Damages are not available unless *IsVisible* for TeamDamage is true</p>
+                    <p>Damages are not available unless specifically turned on in WebServer.cs</p>
                 </div>
                 <div class="fakeimg" style="margin-bottom:0px; padding-top:1px">
-                    <p>Player buff data are not yet completed</p>
+                    <p>You need firewall and to change settings in WebServer.cs to share to local network</p>
                 </div>
             </div>
         </div>

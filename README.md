@@ -27,12 +27,14 @@ I simply added some functions to start a httpserver to respond to the page that 
 - Enter [localhost:8080](http://localhost:8080/) in your browser.
     - Or, you can use your PC's ip address, just make sure that you:
         - Changed the string url under [WebServer.cs](/SmartHunter/WebServer.cs) from http://localhost:8080/ to  http://*:8080/
-        - Check your firewall settings for inout rules to set the port.
+        - Check your firewall settings for the in and out bound rules to set the port, I used 8080 here, my typical testing port, you can find tutorials for [in](https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/create-an-inbound-port-rule) and [out](https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/create-an-outbound-port-rule).
         - The device you want to use to see the data in the same network.
 - Some features are hidden as foldable, so you need to click to extend them. Like monster parts and team damage, etc.
 
 ## Releases
 They are essentially the same version, but I planned on releasing multiple copy compiled in different way just in case anyone wants a specific version but don't know how to compile it. I will add a settings file in the future.
+
+If you run it in admin it starts https server over lan automatically, if not, it starts at localhost.
 
 ## Credits
 - Based on [SmartHunter](https://github.com/gabrielefilipp/SmartHunter)
