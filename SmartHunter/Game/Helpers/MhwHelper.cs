@@ -12,7 +12,9 @@ using SmartHunter.Game.Config;
 using SmartHunter.Game.Data;
 using SmartHunter.Game.Data.ViewModels;
 using SmartHunter.Game.Data.WidgetContexts;
+
 using SmartHunter.StartServer;
+using System.Threading.Tasks;
 
 namespace SmartHunter.Game.Helpers
 {
@@ -972,7 +974,8 @@ namespace SmartHunter.Game.Helpers
                 if (isMonsterSelected)
                 {
                     ulong selectedMonsterAddress = MemoryHelper.Read<ulong>(process, mapBaseAddress + 0x148) - 0X40;
-                    var selectedMonster = UpdateAndGetMonster(process, selectedMonsterAddress);
+                    Monster selectedMonster = UpdateAndGetMonsterWithoutParts(process, selectedMonsterAddress);
+
                     if (selectedMonster != null)
                     {
                         //Update Monster Data Begin//
@@ -988,7 +991,16 @@ namespace SmartHunter.Game.Helpers
             }
             for (int i = 0; i < selectedMonsterAddresses.Count(); i++)
             {
-                var monster = UpdateAndGetMonster(process, selectedMonsterAddresses.ElementAt(i));
+                Monster monster = null;
+                ulong selectedAddress = selectedMonsterAddresses.ElementAt(i);
+                if (WebServer.showPartsData)
+                {
+                    monster = UpdateAndGetMonster(process, selectedAddress);
+                }
+                else
+                {
+                    monster = UpdateAndGetMonsterWithoutParts(process, selectedAddress);
+                }
                 if (monster != null)
                 {
                     updatedMonsters.Add(monster);
@@ -999,6 +1011,44 @@ namespace SmartHunter.Game.Helpers
                 }
             }
             WebServer.WebUpdateMonsterData(updatedMonsters);
+        }
+        private static Monster UpdateAndGetMonsterWithoutParts(Process process, ulong monsterAddress)
+        {
+            Monster monster = null;
+
+            ulong tmp = monsterAddress + DataOffsets.Monster.MonsterStartOfStructOffset + DataOffsets.Monster.MonsterHealthComponentOffset;
+            ulong health_component = MemoryHelper.Read<ulong>(process, tmp);
+
+            string id = MemoryHelper.ReadString(process, tmp + DataOffsets.MonsterModel.IdOffset, (uint)DataOffsets.MonsterModel.IdLength);
+            float maxHealth = MemoryHelper.Read<float>(process, health_component + DataOffsets.MonsterHealthComponent.MaxHealth);
+
+            if (String.IsNullOrEmpty(id))
+            {
+                return monster;
+            }
+
+            id = id.Split('\\').Last();
+            if (!Monster.IsIncluded(id))
+            {
+                return monster;
+            }
+
+            if (maxHealth <= 0)
+            {
+                return monster;
+            }
+
+            float currentHealth = MemoryHelper.Read<float>(process, health_component + DataOffsets.MonsterHealthComponent.CurrentHealth);
+            float sizeScale = MemoryHelper.Read<float>(process, monsterAddress + DataOffsets.Monster.MonsterStartOfStructOffset + DataOffsets.Monster.SizeScale);
+            float scaleModifier = MemoryHelper.Read<float>(process, monsterAddress + DataOffsets.Monster.MonsterStartOfStructOffset + DataOffsets.Monster.ScaleModifier);
+            if (scaleModifier <= 0 || scaleModifier >= 2)
+            {
+                scaleModifier = 1;
+            }
+
+            monster = OverlayViewModel.Instance.MonsterWidget.Context.UpdateAndGetMonster(monsterAddress, id, maxHealth, currentHealth, sizeScale, scaleModifier);
+
+            return monster;
         }
         public static void GetPlayerData(Process process, ulong baseAddress, ulong equipmentAddress, ulong weaponAddress)
         {

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using SmartHunter.Game.Data;
 using System.Runtime.Serialization.Json;
 using SmartHunter.Core;
+using System.Windows.Media;
 
 namespace SmartHunter.StartServer
 {
@@ -22,10 +23,11 @@ namespace SmartHunter.StartServer
         public static int requestCount = 0;
         public static string pageData;
 
-        public static string AllBuffs = "";
+        public static bool showPlayerDamage = false;
+        public static bool showPartsData = true;
 
+        public static string AllBuffs = "";
         public static string AllPlayerDamage = "Dame dane";
-        static bool showPlayerDamage = false;
 
         public static string[] monsterNames = { "No Monster Data", "No Monster Data", "No Monster Data" };
         public static string[] monsterSizes = { "null", "null", "null" };
@@ -73,8 +75,7 @@ namespace SmartHunter.StartServer
                 }
             }
         }
-
-        public static void StartServer()
+        public static void RunServer()
         {
             //Read from PAGE.html as string
             var assembly = Assembly.GetExecutingAssembly();
@@ -109,12 +110,18 @@ namespace SmartHunter.StartServer
             //listenTask.GetAwaiter().GetResult();
             HandleIncomingConnections();
         }
-        public static void StartServerOnThread()
+        public static void StartServer(bool OnThread)
         {
-            Thread thread1 = new Thread(StartServer);
-            thread1.IsBackground = true;
-            //thread1.Start();
-            StartServer();
+            if (OnThread)
+            {
+                Thread thread1 = new Thread(RunServer);
+                thread1.IsBackground = true;
+                thread1.Start();
+            }
+            else
+            {
+                RunServer();
+            }
             // Get the IP  
             string IP = Dns.GetHostByName(Dns.GetHostName()).AddressList[0].ToString();
             Log.WriteLine("");
@@ -123,6 +130,7 @@ namespace SmartHunter.StartServer
             Log.WriteLine("==   " + IP + "   ==");
             Log.WriteLine("=========================");
             Log.WriteLine("");
+            LoadCustomizationSettings();
         }
         public static void EndServer()
         {
@@ -209,7 +217,40 @@ namespace SmartHunter.StartServer
                 }
             }
         }
-
+        public static void LoadCustomizationSettings()
+        {
+            try
+            {
+                string[] textSettings = File.ReadAllLines(Path.Combine(Environment.CurrentDirectory, "HTTPSH_Settings\\Settings.txt"));
+                url = textSettings[1];
+                showPlayerDamage = Convert.ToBoolean(textSettings[3]);
+                showPartsData = Convert.ToBoolean(textSettings[5]);
+                if (Convert.ToBoolean(textSettings[7]))
+                {
+                    LoadIndexPage();
+                }
+            }
+            catch(Exception e)
+            {
+                Log.WriteException(e);
+                Log.WriteLine("ERROR, Something seems to be wrong when loading customization, using deafult settings instead" +
+                    "if you want to use customization, check or create the Settings.txt file under HTTPSH_Settings");
+            }
+            return;
+        }
+        public static void LoadIndexPage()
+        {
+            string indexPage;
+            try
+            {
+                indexPage = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "HTTPSH_Settings\\index.html"));
+                pageData = indexPage;
+            }
+            catch(Exception e)
+            {
+                Log.WriteException(e);
+            }
+        }
         public static string JSONify()
         {
             string JSONified = "{ "

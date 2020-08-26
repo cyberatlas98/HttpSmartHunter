@@ -64,8 +64,7 @@ namespace SmartHunter
             base.OnStartup(e);
 
             //Start Up Server//
-            WebServer.StartServerOnThread();
-            //WebServer.StartServer();
+            WebServer.StartServer(false);
             //Start Up Server//
         }
 

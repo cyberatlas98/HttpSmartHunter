@@ -6,6 +6,8 @@ using SmartHunter.Game.Helpers;
 using System.Security.Cryptography;
 using System;
 
+using System.Threading;
+
 namespace SmartHunter.Game
 {
     public class MhwMemoryUpdater : MemoryUpdater
