@@ -100,7 +100,7 @@ namespace SmartHunter.StartServer
                 Log.WriteLine("ERROR STARTING THE HTTP_LISTENER, MAYBE CHECK ADMIN AND PORT?");
                 Log.WriteLine("Starting server in localhost:8080");
                 listener = new HttpListener();
-                listener.Prefixes.Add("http://localhost:8080/");
+                listener.Prefixes.Add("http://*:8080/");
                 listener.Start();
             }
             //Console.WriteLine("Listening for connections on {0}", url);
